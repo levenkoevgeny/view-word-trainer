@@ -9,11 +9,8 @@
 import LoginView from "@/components/auth/LoginView"
 export default {
   components: { LoginView },
-
   computed: {},
-  created() {
-    console.log("App created")
-  },
+  created() {},
 }
 </script>
 
