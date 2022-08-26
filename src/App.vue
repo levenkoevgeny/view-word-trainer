@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    {{ $store.state.auth.user.lastname }}
+<!--    {{ $store.state.auth.user.lastname }}-->
     <router-view></router-view>
   </div>
 </template>
