@@ -101,6 +101,7 @@ export default {
     return {
       dictionariesList: [],
       dictionariesListCommon: [],
+      dictionarySearchField: '',
       isLoading: true,
       isError: false
     }
@@ -108,7 +109,7 @@ export default {
   async created() {
     try {
       const response = await dictionary_api.getDictionaryList(
-        this.userToken
+        this.userToken, this.dictionarySearchField
       )
       this.dictionariesList = await response.data
     } catch (e) {

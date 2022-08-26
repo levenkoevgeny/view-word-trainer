@@ -1,44 +1,53 @@
 <template>
-  <div class="d-flex flex-row">
-    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px;">
-      <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-        <span class="fs-5 fw-semibold">Dictionary list</span>
-      </a>
-      <div class="list-group list-group-flush border-bottom scrollarea">
-        <template v-for="dict in dictionariesList" :key="dict.id">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-              Train
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li>
-                <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">Time training</button>
-              </li>
-              <li>
-                <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">Spelling training
-                </button>
-              </li>
-            </ul>
-          </div>
-          <button
-            class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true"
-            @click="() => this.$router.push({ name: 'dictionary_words', params: { id: dict.id } })">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-              <strong class="mb-1">{{ dict.dictionary_name }}</strong>
-              <small class="text-muted">Wed</small>
+  <div v-if="isLoading"><Spinner /></div>
+  <div v-else>
+    <div class="d-flex flex-row">
+      <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px;">
+        <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+          <span class="fs-5 fw-semibold">Dictionary list</span>
+        </a>
+        <input type="text" class="form-control" v-model="dictionarySearchField"><br>
+        <div class="list-group list-group-flush border-bottom scrollarea">
+          <template v-for="dict in dictionariesList" :key="dict.id">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                Train
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li>
+                  <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">Time
+                    training
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">Spelling
+                    training
+                  </button>
+                </li>
+              </ul>
             </div>
-            <div class="col-10 mb-1 small">{{ dict.description }}</div>
-          </button>
-        </template>
+            <button
+              class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true"
+              @click="() => this.$router.push({ name: 'dictionary_words', params: { id: dict.id } })">
+              <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">{{ dict.dictionary_name }}</strong>
+                <small class="text-muted">Wed</small>
+              </div>
+              <div class="col-10 mb-1 small">{{ dict.description }}</div>
+            </button>
+          </template>
+        </div>
       </div>
-    </div>
-    <div class="m-3">
-      <div>
-        <router-view />
+      <div class="m-3">
+        <div>
+          <router-view />
+        </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -47,6 +56,7 @@ import Spinner from "@/components/common/Spinner"
 import WordItem from "@/components/WordItem"
 import { dictionary_api } from "@/api/dictionary_api"
 import WordsList from "@/components/WordsList"
+import debounce from "lodash.debounce"
 
 export default {
   name: "DictionariesList",
@@ -55,21 +65,14 @@ export default {
     return {
       dictionariesList: [],
       wordsList: [],
+      dictionarySearchField: "",
       isLoading: true,
       isError: false
     }
   },
   async created() {
-    try {
-      const response = await dictionary_api.getDictionaryList(
-        this.userToken
-      )
-      this.dictionariesList = await response.data
-    } catch (e) {
-      this.isError = true
-    } finally {
-      this.isLoading = false
-    }
+    console.log('created List')
+    await this.initData(this.dictionarySearchField)
   },
   methods: {
     addNewDictionaryHandler() {
@@ -83,6 +86,32 @@ export default {
         name: viewName,
         params: { id: parseInt(dictionaryId) }
       })
+    },
+
+    searchData: debounce(async function(searchField) {
+      try {
+        const response = await dictionary_api.getDictionaryList(
+          this.userToken, searchField
+        )
+        this.dictionariesList = await response.data
+      } catch (e) {
+        this.isError = true
+      } finally {
+        this.isLoading = false
+      }
+    }, 500),
+
+    async initData(searchField) {
+      try {
+        const response = await dictionary_api.getDictionaryList(
+          this.userToken, searchField
+        )
+        this.dictionariesList = await response.data
+      } catch (e) {
+        this.isError = true
+      } finally {
+        this.isLoading = false
+      }
     }
   },
   computed: {
@@ -100,6 +129,13 @@ export default {
         }
         return 0
       })
+    }
+  },
+  watch: {
+    dictionarySearchField: {
+      handler(newValue, oldValue) {
+        this.searchData(this.dictionarySearchField)
+      }
     }
   }
 }

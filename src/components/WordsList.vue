@@ -4,7 +4,7 @@
   </div>
   <div v-else>
     <div class="mb-3">
-    <input class="form-control fs-4" type="text" v-model="dictionary.dictionary_name">
+      <input class="form-control fs-4" type="text" v-model="dictionary.dictionary_name">
     </div>
     <br>
 
@@ -27,17 +27,24 @@
     </form>
     <br>
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" @change="checkAllHandler($event)">
+      <input class="form-check-input" id="checkAllId" ref="checkAllId" type="checkbox"
+             @change="checkAllHandler($event)">
       <label class="form-check-label" for="flexCheckDefault">
         Выделить все
       </label>
     </div>
-    <button @click="deleteCheckedWordsHandler" class="btn btn-danger">Удалить выбранные</button>
+
+    <button @click="deleteCheckedWordsHandler" class="btn btn-danger" v-if="checkedForDeleteCount > 0">
+      Удалить выбранные ({{ checkedForDeleteCount }})
+    </button>
+
     <div class="mt-3">
-      <div v-if="wordsCount" v-for="word in dictionary.words" :key="word.id">
+      <div v-if="wordsCount" v-for="word in filteredWords" :key="word.id">
         <WordItem
           @addInCheckedArray="addInCheckedArrayHandler"
-          :wordItem="word" />
+          :wordItem="word"
+          :dictionaryList="dictionaryList"
+        />
       </div>
     </div>
   </div>
@@ -49,12 +56,14 @@ import { dictionary_api } from "@/api/dictionary_api"
 import { mapGetters } from "vuex"
 import WordItem from "@/components/WordItem"
 import { words_api } from "@/api/words_api"
+import debounce from "lodash.debounce"
 
 export default {
   name: "WordsList",
   components: { WordItem, Spinner },
   data() {
     return {
+      dictionaryList: [],
       dictionary: null,
       isLoading: true,
       newWordForm: {
@@ -66,11 +75,12 @@ export default {
   },
   async created() {
     await this.initData()
-
     this.$watch(
       async () => this.$route.params.id,
       async (toParams, previousParams) => {
-        await this.initData()
+        if (this.$route.params.id) {
+          await this.initData()
+        }
       }
     )
   },
@@ -81,6 +91,18 @@ export default {
     }),
     wordsCount() {
       return this.dictionary.words.length > 0
+    },
+    checkedForDeleteCount() {
+      let counter = 0
+      this.dictionary.words.map(word => {
+        if (word.checked_val) {
+          counter++
+        }
+      })
+      return counter
+    },
+    filteredWords() {
+      return this.dictionary.words.filter(word => word.dictionary === this.dictionary.id)
     }
   },
   methods: {
@@ -103,37 +125,17 @@ export default {
         this.isLoading = false
       }
     },
-    deleteCheckedWordsHandler() {
-      let requestIds = []
-      let responseIds = []
-
-      this.dictionary.words.map(word => {
-        if (word.checked_val) {
-          requestIds.push(word.id)
-        } return
-      })
-      let requests = requestIds.map(id => words_api.deleteWord(this.userToken, id)
-      )
-      Promise.all(requests)
-        .then(responses => responses.forEach(
-          response => {
-            responseIds.push(response.data.id)
-          })
-        ).then(() => {
-          this.dictionary.words = this.dictionary.words.filter(word => !responseIds.includes(word.id))
-        }
-      )
-    },
-    updateWordHandler() {
-    },
-    checkAllHandler(e) {
-      if (e.target.checked) {
-        this.dictionary.words = this.dictionary.words.map(word => ({...word, checked_val: true}))
-      } else {
-        this.dictionary.words = this.dictionary.words.map(word => ({...word, checked_val: false}))
-      }
-    },
     async initData() {
+      try {
+        const response = await dictionary_api.getDictionaryList(
+          this.userToken
+        )
+        this.dictionaryList = await response.data
+      } catch (e) {
+        this.isError = true
+      } finally {
+      }
+
       try {
         const response = await dictionary_api.getDictionary(
           this.userToken,
@@ -148,6 +150,35 @@ export default {
         this.isLoading = false
       }
     },
+    deleteCheckedWordsHandler() {
+      let requestIds = []
+      let responseIds = []
+
+      this.dictionary.words.map(word => {
+        if (word.checked_val) {
+          requestIds.push(word.id)
+        }
+        return
+      })
+      let requests = requestIds.map(id => words_api.deleteWord(this.userToken, id)
+      )
+      Promise.all(requests)
+        .then(responses => responses.forEach(
+          response => {
+            responseIds.push(response.data.id)
+          })
+        ).then(() => {
+        this.dictionary.words = this.dictionary.words.filter(word => !responseIds.includes(word.id))
+        this.$refs.checkAllId.checked = false
+      })
+    },
+    checkAllHandler(e) {
+      if (e.target.checked) {
+        this.dictionary.words = this.dictionary.words.map(word => ({ ...word, checked_val: true }))
+      } else {
+        this.dictionary.words = this.dictionary.words.map(word => ({ ...word, checked_val: false }))
+      }
+    },
     addInCheckedArrayHandler(id, checkedStatus) {
       if (checkedStatus) {
         this.checkedWordsForDelete.push(id)
@@ -158,8 +189,25 @@ export default {
           }
         }
       }
+    },
+    updateDictionaryData: debounce(async function() {
+      try {
+        const response = await dictionary_api.updateDictionary(
+          this.userToken,
+          this.dictionary
+        )
+        // this.$emit("sendSuccessToast")
+      } catch (error) {
+        // this.$emit("setIsError", true)
+      }
+    }, 500),
+  },
+  watch: {
+    "dictionary.dictionary_name": {
+      handler(newValue, oldValue) {
+        this.updateDictionaryData()
+      }
     }
-
   }
 }
 </script>
