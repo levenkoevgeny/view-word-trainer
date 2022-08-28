@@ -1,42 +1,60 @@
 <template>
-  <div v-if="isLoading" class="d-flex justify-content-center align-items-center border" style="width: 100%; height: 100vh">
+  <div v-if="isLoading" class="d-flex justify-content-center align-items-center border"
+       style="width: 100%; height: 100vh">
     <Spinner />
   </div>
   <div v-else>
-    <div class="mb-3">
-      <input class="form-control fs-4" type="text" v-model="dictionary.dictionary_name">
+    <div class="my-3">
+      <input
+        class="form-control fs-4"
+        type="text"
+        v-model="dictionary.dictionary_name"
+        placeholder="Название словаря">
+    </div>
+    <div class="my-3">
+      <input
+        class="form-control fs-6"
+        type="text"
+        v-model="dictionary.description"
+        placeholder="Описание">
     </div>
     <br>
 
-    <form @submit="addNewWordHandler" method="POST">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Оригинал</label>
-            <input type="text" class="form-control" v-model="newWordForm.word_rus">
+    <div class="shadow p-3 mb-5 bg-body rounded">
+      <form @submit="addNewWordHandler" method="POST">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Оригинал</label>
+              <input type="text" class="form-control" v-model="newWordForm.word_rus">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Перевод</label>
+              <input type="text" class="form-control" v-model="newWordForm.word_eng">
+            </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Перевод</label>
-            <input type="text" class="form-control" v-model="newWordForm.word_eng">
-          </div>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%">Добавить</button>
-    </form>
-    <br>
-    <div class="form-check">
-      <input class="form-check-input" id="checkAllId" ref="checkAllId" type="checkbox"
-             @change="checkAllHandler($event)">
-      <label class="form-check-label" for="flexCheckDefault">
-        Выделить все
-      </label>
+        <button type="submit" class="btn btn-primary" style="width: 100%">Добавить</button>
+      </form>
     </div>
 
-    <button @click="deleteCheckedWordsHandler" class="btn btn-danger" v-if="checkedForDeleteCount > 0">
-      Удалить выбранные ({{ checkedForDeleteCount }})
-    </button>
+<div class="d-flex flex-row justify-content-between align-items-end">
+  <div class="form-check">
+    <input class="form-check-input" id="checkAllId" ref="checkAllId" type="checkbox"
+           @change="checkAllHandler($event)">
+    <label class="form-check-label">
+      Выделить все
+    </label>
+  </div>
+  <button @click="deleteCheckedWordsHandler" class="btn btn-danger" v-if="checkedForDeleteCount > 0">
+    Удалить выбранные ({{ checkedForDeleteCount }})
+  </button>
+</div>
+
+
+
 
     <div class="mt-3">
       <div v-if="wordsCount" v-for="word in filteredWords" :key="word.id">
@@ -119,6 +137,10 @@ export default {
         )
         const newWord = await response.data
         this.dictionary.words.push(newWord)
+        this.newWordForm = {
+          word_rus: "",
+          word_eng: ""
+        }
       } catch (e) {
         this.isError = true
       } finally {
@@ -197,14 +219,20 @@ export default {
       } catch (error) {
         // this.$emit("setIsError", true)
       }
-    }, 500),
+    }, 500)
   },
   watch: {
     "dictionary.dictionary_name": {
       handler(newValue, oldValue) {
         this.updateDictionaryData()
       }
+    },
+    "dictionary.description": {
+      handler(newValue, oldValue) {
+        this.updateDictionaryData()
+      }
     }
+
   }
 }
 </script>

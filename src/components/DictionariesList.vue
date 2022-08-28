@@ -3,7 +3,7 @@
   <div class="modal fade" id="addDictionaryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <form @submit="addNewDictionaryHandler" method="POST">
-        <div class="modal-content">
+        <div class="modal-content" style="width: 400px;">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Новый словарь</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -29,83 +29,94 @@
         <div v-if="isLoading" class="d-flex justify-content-center align-items-center" style="height: 100vh">
           <Spinner />
         </div>
-        <div v-else class="d-flex flex-row">
-          <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px;">
-            <a href="/"
-               class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-              <span class="fs-5 fw-semibold">Dictionary list</span>
-            </a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDictionaryModal">
-              Add new
+        <div v-else>
+          <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white">
+            <!--            <a href="/"-->
+            <!--               class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">-->
+            <!--              <span class="fs-5 fw-semibold">Dictionary list</span>-->
+            <!--            </a>-->
+            <!--            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDictionaryModal">-->
+            <!--              Add new-->
+            <!--            </button>-->
+            <h3 class="my-3">Список словарей</h3>
+            <input type="text" class="form-control mt-3" v-model="dictionarySearchField" placeholder="Поиск..."><br>
+            <button
+              type="button"
+              class="btn btn-light link-secondary fs-5 text-center mb-3"
+              title="Создать копию"
+              data-bs-toggle="modal"
+              data-bs-target="#addDictionaryModal"
+              style="width: 50px;"
+            >
+              <font-awesome-icon icon="fa-solid fa-square-plus" style="font-size: 30px;"/>
             </button>
-
-            <input type="text" class="form-control" v-model="dictionarySearchField"><br>
-            <div class="list-group list-group-flush border-bottom scrollarea">
+            <div class="list-group list-group-flush border-bottom scrollarea" style="overflow: auto; height: 70vh;">
               <template v-for="dict in dictionariesList" :key="dict.id">
-
                 <div>
                   <button
-                    class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true"
+                    class="list-group-item list-group-item-action py-3 lh-tight d-flex flex-row" aria-current="true"
                     @click="() => this.$router.push({ name: 'dictionary_words', params: { id: dict.id } })">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
-                      <strong class="mb-1">{{ dict.dictionary_name }}</strong>
+                    <img :src="getLogoUrlDefault()" class="m-2" alt="ggg" style="height: 30px;">
+                    <div>
+                      <div class="d-flex w-100 align-items-center justify-content-between">
+                        <strong class="mb-1">{{ dict.dictionary_name }}</strong>
+                      </div>
+                      <div class="col-10 mb-1 small">{{ dict.description }}</div>
                     </div>
-                    <div class="col-10 mb-1 small">{{ dict.description }}</div>
                   </button>
                 </div>
                 <div class="d-flex flex-row">
-                  <div class="dropdown" style="width: 100%">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle text-wrap" type="button"
-                            id="dropdownMenuButton10" data-bs-toggle="dropdown" aria-expanded="false"
-                            style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;width: 50%">
-                      Тренировать
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                      <li>
-                        <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">
-                          Тренировка на скорость
-                        </button>
-                      </li>
-                      <li>
-                        <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">
-                          Тренировка правописания
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <button class="btn btn-outline-danger" @click="deleteDictionaryHandler(dict.id)">Удалить словарь</button>
-                  </div>
+                  <!--                  <div class="dropdown" style="width: 100%">-->
+                  <!--                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle text-wrap" type="button"-->
+                  <!--                            id="dropdownMenuButton10" data-bs-toggle="dropdown" aria-expanded="false"-->
+                  <!--                            style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;width: 50%">-->
+                  <!--                      Тренировать-->
+                  <!--                    </button>-->
+                  <!--                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">-->
+                  <!--                      <li>-->
+                  <!--                        <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">-->
+                  <!--                          Тренировка на скорость-->
+                  <!--                        </button>-->
+                  <!--                      </li>-->
+                  <!--                      <li>-->
+                  <!--                        <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">-->
+                  <!--                          Тренировка правописания-->
+                  <!--                        </button>-->
+                  <!--                      </li>-->
+                  <!--                    </ul>-->
+                  <!--                  </div>-->
+                  <!--                  <div>-->
+                  <!--                    <button class="btn btn-outline-danger" @click="deleteDictionaryHandler(dict.id)">Удалить словарь</button>-->
+                  <!--                  </div>-->
                 </div>
 
-<!--                <div class="dropdown">-->
-<!--                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"-->
-<!--                          data-bs-toggle="dropdown"-->
-<!--                          aria-expanded="false">-->
-<!--                    Train-->
-<!--                  </button>-->
-<!--                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">-->
-<!--                    <li>-->
-<!--                      <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">Time-->
-<!--                        training-->
-<!--                      </button>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                      <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">-->
-<!--                        Spelling-->
-<!--                        training-->
-<!--                      </button>-->
-<!--                    </li>-->
-<!--                  </ul>-->
-<!--                </div>-->
-<!--                <button @click="deleteDictionaryHandler(dict.id)">Удалить словарь</button>-->
+                <!--                <div class="dropdown">-->
+                <!--                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"-->
+                <!--                          data-bs-toggle="dropdown"-->
+                <!--                          aria-expanded="false">-->
+                <!--                    Train-->
+                <!--                  </button>-->
+                <!--                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">-->
+                <!--                    <li>-->
+                <!--                      <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_time_training')">Time-->
+                <!--                        training-->
+                <!--                      </button>-->
+                <!--                    </li>-->
+                <!--                    <li>-->
+                <!--                      <button class="dropdown-item" @click="changeRoute(dict.id, 'dictionaries_spelling_training')">-->
+                <!--                        Spelling-->
+                <!--                        training-->
+                <!--                      </button>-->
+                <!--                    </li>-->
+                <!--                  </ul>-->
+                <!--                </div>-->
+                <!--                <button @click="deleteDictionaryHandler(dict.id)">Удалить словарь</button>-->
 
 
               </template>
             </div>
           </div>
         </div>
-
       </div>
       <div class="col-md-8">
         <router-view />
@@ -167,7 +178,7 @@ export default {
       let result = confirm("Удалить словарь со всеми словами?")
       if (result) {
         try {
-          const response = await dictionary_api.deleteDictionary(
+          await dictionary_api.deleteDictionary(
             this.userToken,
             id)
           this.dictionariesList = this.dictionariesList.filter(dictionary => dictionary.id !== id)
@@ -198,8 +209,8 @@ export default {
         this.isLoading = false
       }
     }, 500),
-
     async initData(searchField) {
+      this.isLoading = true
       try {
         const response = await dictionary_api.getDictionaryList(
           this.userToken, searchField
@@ -210,6 +221,9 @@ export default {
       } finally {
         this.isLoading = false
       }
+    },
+    getLogoUrlDefault() {
+      return `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/media/dictionary/dictionary-default.png`
     }
   },
   computed: {

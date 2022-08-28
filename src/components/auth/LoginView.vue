@@ -33,7 +33,7 @@
         <br />
         <br />
         <a class="" href="/registration">Нет аккаунта?</a>
-        <p class="mt-5 mb-3 text-muted">&copy; Разработано ООИТ Академии МВД</p>
+        <p class="mt-5 mb-3 text-muted">&copy; Designed by Levenko Evgeny</p>
       </form>
     </main>
   </div>
