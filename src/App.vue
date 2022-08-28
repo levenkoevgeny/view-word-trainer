@@ -1,15 +1,24 @@
 <template>
+  <div class="container-fluid" v-if="userData">
+    <Navbar />
+  </div>
+
   <div class="container">
-<!--    {{ $store.state.auth.user.lastname }}-->
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import LoginView from "@/components/auth/LoginView"
+import Navbar from "@/components/common/Navbar"
+import { mapGetters } from "vuex"
 export default {
-  components: { LoginView },
-  computed: {},
+  components: { Navbar },
+  computed: {
+    ...mapGetters({
+      userData: "auth/getUser",
+      userToken: "auth/getToken"
+    }),
+  },
   created() {},
 }
 </script>

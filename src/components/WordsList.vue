@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoading">
+  <div v-if="isLoading" class="d-flex justify-content-center align-items-center border" style="width: 100%; height: 100vh">
     <Spinner />
   </div>
   <div v-else>
@@ -131,19 +131,16 @@ export default {
           this.userToken
         )
         this.dictionaryList = await response.data
-      } catch (e) {
-        this.isError = true
-      } finally {
-      }
 
-      try {
-        const response = await dictionary_api.getDictionary(
+
+        const responseDict = await dictionary_api.getDictionary(
           this.userToken,
           this.$route.params.id
         )
-        this.dictionary = await response.data
+        this.dictionary = await responseDict.data
 
         this.dictionary.words = this.dictionary.words.map(word => ({ ...word, checked_val: false }))
+
       } catch (e) {
         this.isError = true
       } finally {
