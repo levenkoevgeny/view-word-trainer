@@ -1,15 +1,19 @@
 <template>
-  <h1 style="font-size: 100px">{{ dictionary.dictionary_name }}</h1>
-  <label class="form-label">Interval speed</label>
-  <input type="range" class="form-range" :min="minIntervalSpeed" :max="maxIntervalSpeed" v-model="intervalSpeed">
-  <button @click="startTrain">Start</button>
-  <button @click="stopTrain">Stop</button>
-  <br>
-  <br>
-  <br>
-  <h1 v-if="randomWord">{{ randomWord.word_eng }}</h1>
-
-
+  <h1 class="my-3" style="font-size: 60px" v-if="dictionary">{{ dictionary.dictionary_name }}</h1>
+  <div class="d-flex justify-content-center">
+    <p class="fs-2">Interval speed - <span class="ds-1 fw-bold">{{ intervalSpeed }}x</span></p>
+  </div>
+  <div class="d-flex flex-row align-items-center my-3">
+    <span class="me-2 fs-3">{{ minIntervalSpeed }}x</span>
+    <input type="range" class="form-range" :min="minIntervalSpeed" :max="maxIntervalSpeed" v-model="intervalSpeed">
+    <span class="ms-2 fs-3">{{ maxIntervalSpeed }}x</span>
+  </div>
+  <button @click="startTrain" v-if="!isTrainRunning">Start</button>
+  <button @click="stopTrain" v-if="isTrainRunning">Stop</button>
+  <div class="my-5">
+    <h1 v-if="randomWord" class="text-center" style="width: 100%; font-size: 70px;">{{ randomWord.word_rus }}</h1>
+    <h1 v-if="randomWord" class="text-center alert alert-success" ref="answer" style="width: 100%; font-size: 40px; display: none">{{ randomWord.word_eng }}</h1>
+  </div>
 </template>
 
 <script>
@@ -21,12 +25,14 @@ export default {
   data() {
     return {
       dictionary: null,
-      randomWord: null,
+      randomWord: {"word_rus": "word_rus",
+        "word_eng": "word_eng"},
       isLoading: true,
       intervalId: null,
       intervalSpeed: 1,
       minIntervalSpeed: 1,
-      maxIntervalSpeed: 10,
+      maxIntervalSpeed: 5,
+      isTrainRunning: false
     }
   },
   computed: {
@@ -37,8 +43,11 @@ export default {
   },
   watch: {
     intervalSpeed(newInterval, oldInterval) {
-      clearInterval(this.intervalId)
-      this.intervalId = setInterval(() => this.getRandomWord(), this.maxIntervalSpeed * 1000 - this.intervalSpeed * 1000)
+      if (this.isTrainRunning) {
+        clearInterval(this.intervalId)
+        this.intervalId = setInterval(() => this.getRandomWord(),
+        (this.maxIntervalSpeed + 1) * 1000 - this.intervalSpeed * 1000)
+      }
     }
   },
   async created() {
@@ -67,13 +76,19 @@ export default {
       }
     },
     getRandomWord() {
+      this.$refs.answer.style.display = "none"
+      console.log(Date.now().toLocaleString())
       let randomIndex = Math.floor(Math.random() * this.dictionary.words.length)
       this.randomWord = this.dictionary.words[randomIndex]
+      setTimeout(() => this.$refs.answer.style.display = "block", (this.maxIntervalSpeed) * 1000 - this.intervalSpeed)
     },
     startTrain() {
-      this.intervalId = setInterval(() => this.getRandomWord(), this.maxIntervalSpeed * 1000 - this.intervalSpeed * 1000)
+      this.isTrainRunning = true
+      clearInterval(this.intervalId)
+      this.intervalId = setInterval(() => this.getRandomWord(), (this.maxIntervalSpeed + 2) * 1000 - this.intervalSpeed * 1000)
     },
     stopTrain() {
+      this.isTrainRunning = false
       clearInterval(this.intervalId)
     }
   }

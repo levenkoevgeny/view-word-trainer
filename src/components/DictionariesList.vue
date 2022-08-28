@@ -1,4 +1,29 @@
 <template>
+<!--add modal-->
+  <div class="modal fade" id="addDictionaryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form @submit="addNewDictionaryHandler" method="POST">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Новый словарь</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Название словаря</label>
+              <input type="text" class="form-control" v-model="newDictionaryForm.dictionary_name" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" ref="modalClose" data-bs-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+
+
   <div v-if="isLoading"><Spinner /></div>
   <div v-else>
     <div class="d-flex flex-row">
@@ -6,6 +31,10 @@
         <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
           <span class="fs-5 fw-semibold">Dictionary list</span>
         </a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDictionaryModal">
+          Add new
+        </button>
+
         <input type="text" class="form-control" v-model="dictionarySearchField"><br>
         <div class="list-group list-group-flush border-bottom scrollarea">
           <template v-for="dict in dictionariesList" :key="dict.id">
@@ -28,12 +57,17 @@
                 </li>
               </ul>
             </div>
+
+<!--            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDictionaryModal">-->
+<!--              Удалить словарь-->
+<!--            </button>-->
+            <button @click="deleteDictionaryHandler(dict.id)">Удалить словарь</button>
+
             <button
               class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true"
               @click="() => this.$router.push({ name: 'dictionary_words', params: { id: dict.id } })">
               <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">{{ dict.dictionary_name }}</strong>
-                <small class="text-muted">Wed</small>
               </div>
               <div class="col-10 mb-1 small">{{ dict.description }}</div>
             </button>
@@ -66,20 +100,51 @@ export default {
       dictionariesList: [],
       wordsList: [],
       dictionarySearchField: "",
+      newDictionaryForm: {
+        dictionary_name: ""
+      },
       isLoading: true,
       isError: false
     }
   },
   async created() {
-    console.log('created List')
     await this.initData(this.dictionarySearchField)
   },
   methods: {
-    addNewDictionaryHandler() {
+    async addNewDictionaryHandler(e) {
+      e.preventDefault()
+      try {
+
+        const response = await dictionary_api.addDictionary(
+          this.userToken,
+          {
+            ...this.newDictionaryForm,
+            "owner": this.userData.id
+          }
+        )
+        const newDictionary = await response.data
+        this.dictionariesList.push(newDictionary)
+        this.$refs.modalClose.click()
+        this.newDictionaryForm.dictionary_name = ""
+        // this.$emit("sendSuccessToast")
+      } catch (error) {
+        // this.$emit("setIsError", true)
+      } finally {}
     },
-    deleteDictionaryHandler() {
-    },
-    updateDictionaryHandler() {
+    async deleteDictionaryHandler(id) {
+      let result = confirm("Удалить словарь со всеми словами?")
+      if (result) {
+        try {
+          const response = await dictionary_api.deleteDictionary(
+            this.userToken,
+            id)
+          this.dictionariesList = this.dictionariesList.filter(dictionary => dictionary.id !== id)
+          // this.$emit("sendSuccessToast")
+        } catch (error) {
+          // this.$emit("setIsError", true)
+        } finally {}
+      }
+
     },
     changeRoute(dictionaryId, viewName) {
       this.$router.push({
