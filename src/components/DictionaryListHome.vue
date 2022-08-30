@@ -147,7 +147,7 @@
 
       </div>
     </div>
-
+{{userToken}}
   </main>
 </div>
 
@@ -202,6 +202,7 @@ export default {
           }
         )
         const newDictionary = await response.data
+
         this.dictionariesList.push(newDictionary)
         this.$refs.modalClose.click()
         this.newDictionaryForm.dictionary_name = ""

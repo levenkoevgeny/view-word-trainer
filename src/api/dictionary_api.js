@@ -21,6 +21,7 @@ export const dictionary_api = {
     )
   },
   async addDictionary(token, dictionaryData) {
+    console.log('add')
     return axios.post(
       `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/dictionaries/`,
       dictionaryData,

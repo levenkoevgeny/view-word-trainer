@@ -2,8 +2,7 @@ import { api } from "@/api/auth_api"
 import {
   getLocalToken,
   saveLocalToken,
-  removeLocalToken,
-  saveLocalRefreshToken,
+  removeLocalToken
 } from "@/utils"
 import router from "@/router/router"
 
@@ -41,13 +40,13 @@ const actions = {
       let { username, password } = payload
       const response = await api.logInGetToken(username, password)
       const data = await response.data
-      const token = data.access
+      const token = data.token
       if (token) {
         saveLocalToken(token)
         commit("setToken", token)
         commit("setLoggedIn", true)
         commit("setIsLogInError", false)
-        const response = await api.getUserData(token)
+        const response = await api.getUserData(token, data.user_id)
         const userData = await response.data
         commit("setUserData", { ...userData })
       }

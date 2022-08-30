@@ -5,10 +5,11 @@ import router from "@/router/router"
 export function authHeaders(token) {
   return {
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Token ${token}`
     }
   }
 }
+
 
 axios.interceptors.response.use(
   function(response) {
@@ -36,7 +37,7 @@ export const api = {
     params.append("password", password)
 
     return axios.post(
-      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/token/`,
+      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api-token-auth/`,
       params
     )
   },
@@ -49,9 +50,9 @@ export const api = {
       params
     )
   },
-  async getUserData(token) {
+  async getUserData(token, userId) {
     return axios.get(
-      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/users/me/`,
+      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/users/me/?user_id=${userId}`,
       authHeaders(token)
     )
   },
