@@ -1,13 +1,14 @@
 import { api } from "@/api/auth_api"
 import {
-  getLocalToken,
-  saveLocalToken,
-  removeLocalToken
+  getLocalItem,
+  saveLocalItem,
+  removeLocalItem
 } from "@/utils"
 import router from "@/router/router"
 
 const state = () => ({
   token: null,
+  userId: null,
   isLoggedIn: null,
   isLogInError: null,
   isRegistrationError: null,
@@ -18,6 +19,9 @@ const state = () => ({
 const getters = {
   getToken(state) {
     return state.token
+  },
+  getUserId(state) {
+    return state.userId
   },
   getIsLoggedIn(state) {
     return state.isLoggedIn
@@ -39,14 +43,15 @@ const actions = {
     try {
       let { username, password } = payload
       const response = await api.logInGetToken(username, password)
-      const data = await response.data
-      const token = data.token
+      const {token, user_id} = await response.data
       if (token) {
-        saveLocalToken(token)
+        saveLocalItem("token", token)
+        saveLocalItem("user_id", user_id)
         commit("setToken", token)
+        commit("setUserId", user_id)
         commit("setLoggedIn", true)
         commit("setIsLogInError", false)
-        const response = await api.getUserData(token, data.user_id)
+        const response = await api.getUserData(token, user_id)
         const userData = await response.data
         commit("setUserData", { ...userData })
       }
@@ -68,16 +73,25 @@ const actions = {
   async actionCheckLoggedIn({ state, commit, dispatch }) {
     if (!state.isLoggedIn) {
       let token = state.token
+      let user_id = state.userId
       if (!token) {
-        const localToken = getLocalToken()
+        const localToken = getLocalItem("token")
         if (localToken) {
           commit("setToken", localToken)
           token = localToken
         }
       }
+      if (!user_id) {
+        const localUserId = getLocalItem("user_id")
+        if (localUserId) {
+          commit("setUserId", localUserId)
+          user_id = localUserId
+        }
+      }
+
       if (token) {
         try {
-          const response = await api.getUserData(token)
+          const response = await api.getUserData(token, user_id)
           const userData = await response.data
           commit("setUserData", { ...userData })
           commit("setLoggedIn", true)
@@ -91,7 +105,8 @@ const actions = {
   },
 
   async actionRemoveLogIn({ state, commit }) {
-    removeLocalToken()
+    removeLocalItem("token")
+    removeLocalItem("user_id")
     commit("setToken", "")
     commit("setLoggedIn", false)
   },
@@ -109,6 +124,9 @@ const mutations = {
   },
   setToken(state, payload) {
     state.token = payload
+  },
+  setUserId(state, payload) {
+    state.userId = payload
   },
   setUserData(state, payload) {
     state.user = payload

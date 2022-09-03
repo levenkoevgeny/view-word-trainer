@@ -2,9 +2,9 @@ import axios from "axios"
 import { authHeaders } from "@/api/auth_api"
 
 export const dictionary_api = {
-  async getDictionaryList(token, dictionarySearchField='') {
+  async getDictionaryList(token, dictionarySearchField='', user_id) {
     return axios.get(
-      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/dictionaries?dictionary_name=${dictionarySearchField}`,
+      `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/dictionaries?dictionary_name=${dictionarySearchField}&user_id=${user_id}`,
       authHeaders(token)
     )
   },
@@ -21,7 +21,6 @@ export const dictionary_api = {
     )
   },
   async addDictionary(token, dictionaryData) {
-    console.log('add')
     return axios.post(
       `${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/dictionaries/`,
       dictionaryData,
@@ -34,8 +33,6 @@ export const dictionary_api = {
       authHeaders(token))
   },
   async updateDictionaryPartly(token, dictionaryId, dictionaryData) {
-    console.log(dictionaryId)
-    console.log(dictionaryData)
     return axios.patch(`${process.env.VUE_APP_BACKEND_PROTOCOL}://${process.env.VUE_APP_BACKEND_HOST}:${process.env.VUE_APP_BACKEND_PORT}/api/dictionaries/${dictionaryId}/`,
       dictionaryData,
       authHeaders(token))

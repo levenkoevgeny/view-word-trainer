@@ -213,7 +213,7 @@ export default {
       this.isLoading = true
       try {
         const response = await dictionary_api.getDictionaryList(
-          this.userToken, searchField
+          this.userToken, searchField, this.userData.id
         )
         this.dictionariesList = await response.data
       } catch (e) {

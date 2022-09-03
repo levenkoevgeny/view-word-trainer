@@ -25,8 +25,7 @@ export default {
   data() {
     return {
       dictionary: null,
-      randomWord: {"word_rus": "word_rus",
-        "word_eng": "word_eng"},
+      randomWord: null,
       isLoading: true,
       intervalId: null,
       intervalSpeed: 1,
@@ -76,11 +75,8 @@ export default {
       }
     },
     getRandomWord() {
-      this.$refs.answer.style.display = "none"
-      console.log(Date.now().toLocaleString())
       let randomIndex = Math.floor(Math.random() * this.dictionary.words.length)
       this.randomWord = this.dictionary.words[randomIndex]
-      setTimeout(() => this.$refs.answer.style.display = "block", (this.maxIntervalSpeed) * 1000 - this.intervalSpeed)
     },
     startTrain() {
       this.isTrainRunning = true

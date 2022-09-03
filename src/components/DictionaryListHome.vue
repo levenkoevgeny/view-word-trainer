@@ -144,10 +144,8 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
-{{userToken}}
   </main>
 </div>
 
@@ -177,7 +175,7 @@ export default {
     try {
 
       const response = await dictionary_api.getDictionaryList(
-        this.userToken, this.dictionarySearchField
+        this.userToken, this.dictionarySearchField, this.userData.id
       )
       const responseCommon = await dictionary_api.getDictionaryListCommon(
         this.userToken

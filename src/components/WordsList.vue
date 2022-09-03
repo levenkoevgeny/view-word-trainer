@@ -150,7 +150,7 @@ export default {
     async initData() {
       try {
         const response = await dictionary_api.getDictionaryList(
-          this.userToken
+          this.userToken, '', this.userData.id
         )
         this.dictionaryList = await response.data
 
