@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" v-if="userData">
+  <div class="container-fluid" v-if="isLogged">
     <Navbar />
   </div>
 
@@ -16,7 +16,8 @@ export default {
   computed: {
     ...mapGetters({
       userData: "auth/getUser",
-      userToken: "auth/getToken"
+      userToken: "auth/getToken",
+      isLogged: "auth/getIsLoggedIn"
     }),
   },
   created() {},
