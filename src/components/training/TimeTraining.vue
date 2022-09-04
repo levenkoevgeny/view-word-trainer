@@ -8,9 +8,13 @@
     <input type="range" class="form-range" :min="minIntervalSpeed" :max="maxIntervalSpeed" v-model="intervalSpeed">
     <span class="ms-2 fs-3">{{ maxIntervalSpeed }}x</span>
   </div>
-  <div class="d-flex align-items-center justify-content-center" v-if="dictionary.words.length > 0">
-    <button @click="startTrain" class="btn btn-outline-secondary rounded-circle" style="width: 70px; height: 70px;" v-if="!isTrainRunning">Start</button>
-    <button @click="stopTrain" class="btn btn-outline-secondary rounded-circle" style="width: 70px; height: 70px;" v-if="isTrainRunning">Stop</button>
+  <div class="d-flex align-items-center justify-content-center" v-if="dictionary.words.length > 0" style="font-size: 30px;">
+    <button @click="startTrain" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: inherit" v-if="!isTrainRunning">
+      <font-awesome-icon icon="fa-solid fa-play" />
+    </button>
+    <button @click="stopTrain" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: inherit" v-if="isTrainRunning">
+      <font-awesome-icon icon="fa-solid fa-pause" />
+    </button>
   </div>
   <div class="d-flex align-items-center justify-content-center" v-if="dictionary.words.length <= 0">
     <h1>Словарь пустой</h1>
