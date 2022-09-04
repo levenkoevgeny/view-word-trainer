@@ -66,9 +66,8 @@
                   <div class="card-body">
                     <h5>{{ dict.dictionary_name }}</h5>
                     <p class="card-text text-truncate" style="height: 20px"
-                       title="This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.">
-                      This is a wider card with supporting text below as a natural lead-in to additional content. This
-                      content is a little bit longer.</p>
+                       :title=dict.description>
+                      {{dict.description}}</p>
                     <div style="height: 10px;"></div>
                     <small class="text-muted">{{ dict.words.length }} слов</small>
                     <div class="d-flex justify-content-between align-items-center mt-2">
@@ -157,7 +156,6 @@
               </div>
             </div>
           </div>
-
 
         </div>
       </div>

@@ -6,14 +6,14 @@
   <div v-else>
     <div class="my-3">
       <input
-        class="form-control fs-4"
+        class="form-control_override fs-2"
         type="text"
         v-model="dictionary.dictionary_name"
         placeholder="Название словаря">
     </div>
     <div class="my-3">
       <input
-        class="form-control fs-6"
+        class="form-control_override fs-4"
         type="text"
         v-model="dictionary.description"
         placeholder="Описание">
@@ -237,4 +237,37 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.form-control_override {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid #ced4da;
+  /*border-bottom: 1px solid #ced4da;*/
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control_override:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control_override::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+</style>
