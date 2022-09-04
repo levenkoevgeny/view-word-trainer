@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" v-if="isLogged">
+  <div v-if="isLogged">
     <Navbar />
   </div>
 

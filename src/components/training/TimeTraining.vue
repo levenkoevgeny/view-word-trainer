@@ -8,11 +8,17 @@
     <input type="range" class="form-range" :min="minIntervalSpeed" :max="maxIntervalSpeed" v-model="intervalSpeed">
     <span class="ms-2 fs-3">{{ maxIntervalSpeed }}x</span>
   </div>
-  <button @click="startTrain" v-if="!isTrainRunning">Start</button>
-  <button @click="stopTrain" v-if="isTrainRunning">Stop</button>
-  <div class="my-5">
+  <div class="d-flex align-items-center justify-content-center" v-if="dictionary.words.length > 0">
+    <button @click="startTrain" class="btn btn-outline-secondary rounded-circle" style="width: 70px; height: 70px;" v-if="!isTrainRunning">Start</button>
+    <button @click="stopTrain" class="btn btn-outline-secondary rounded-circle" style="width: 70px; height: 70px;" v-if="isTrainRunning">Stop</button>
+  </div>
+  <div class="d-flex align-items-center justify-content-center" v-if="dictionary.words.length <= 0">
+    <h1>Словарь пустой</h1>
+  </div>
+
+  <div class="my-4">
     <h1 v-if="randomWord" class="text-center" style="width: 100%; font-size: 70px;">{{ randomWord.word_rus }}</h1>
-    <h1 v-if="randomWord" class="text-center alert alert-success" ref="answer" style="width: 100%; font-size: 40px; display: none">{{ randomWord.word_eng }}</h1>
+    <h1 v-if="randomWord" class="text-center alert alert-success" ref="answer" style="width: 100%; font-size: 10px;">{{ randomWord.word_eng }}</h1>
   </div>
 </template>
 

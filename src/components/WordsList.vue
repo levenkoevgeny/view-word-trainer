@@ -23,16 +23,16 @@
     <div class="shadow p-3 mb-5 bg-body rounded">
       <form @submit="addNewWordHandler" method="POST">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="mb-3">
               <label class="form-label">Оригинал</label>
-              <input type="text" class="form-control" v-model="newWordForm.word_rus">
+              <input type="text" class="form-control" v-model="newWordForm.word_eng">
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="mb-3">
-              <label class="form-label">Перевод</label>
-              <input type="text" class="form-control" v-model="newWordForm.word_eng">
+              <label class="form-label">Перевод (русский)</label>
+              <input type="text" class="form-control" v-model="newWordForm.word_rus">
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@
       </form>
     </div>
 
-<div class="d-flex flex-row justify-content-between align-items-end">
+<div class="d-flex flex-row justify-content-between align-items-end" v-if="dictionary.words.length > 0">
   <div class="form-check">
     <input class="form-check-input" id="checkAllId" ref="checkAllId" type="checkbox"
            @change="checkAllHandler($event)">
@@ -52,9 +52,6 @@
     Удалить выбранные ({{ checkedForDeleteCount }})
   </button>
 </div>
-
-
-
 
     <div class="mt-3">
       <div v-if="wordsCount" v-for="word in filteredWords" :key="word.id">
@@ -97,6 +94,7 @@ export default {
       async () => this.$route.params.id,
       async (toParams, previousParams) => {
         if (this.$route.params.id) {
+          this.isLoading = true
           await this.initData()
         }
       }
@@ -170,6 +168,7 @@ export default {
       }
     },
     deleteCheckedWordsHandler() {
+      this.isLoading = true
       let requestIds = []
       let responseIds = []
 
@@ -188,7 +187,8 @@ export default {
           })
         ).then(() => {
         this.dictionary.words = this.dictionary.words.filter(word => !responseIds.includes(word.id))
-        this.$refs.checkAllId.checked = false
+      }).finally(() => {
+        this.isLoading = false
       })
     },
     checkAllHandler(e) {
